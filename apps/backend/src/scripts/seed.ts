@@ -7,9 +7,9 @@ import {
 } from "@medusajs/framework/utils"
 import {
   createApiKeysWorkflow,
+  createCollectionsWorkflow,
   createInventoryLevelsWorkflow,
   createProductCategoriesWorkflow,
-  createProductOptionsWorkflow,
   createProductsWorkflow,
   createRegionsWorkflow,
   createSalesChannelsWorkflow,
@@ -21,16 +21,29 @@ import {
   linkSalesChannelsToStockLocationWorkflow,
 } from "@medusajs/medusa/core-flows"
 
-const imageUrl =
-  "https://images.unsplash.com/photo-1518608774889-b04d2abe7702?auto=format&fit=crop&w=1200&q=80"
-
 type VariantInput = {
   title: string
   sku: string
   options: Record<string, string>
   usd: number
   aud: number
+  stocked_quantity?: number
 }
+
+type ProductSeedInput = {
+  title: string
+  subtitle?: string
+  description: string
+  handle: string
+  weight?: number
+  categoryName: string
+  collectionHandle?: string
+  metadata: Record<string, unknown>
+  options: { title: string; values: string[] }[]
+  variants: VariantInput[]
+}
+
+type SeedRecord = Record<string, any>
 
 const money = (amount: number, currency_code: "usd" | "aud") => ({
   amount,
@@ -38,10 +51,723 @@ const money = (amount: number, currency_code: "usd" | "aud") => ({
 })
 
 const variants = (items: VariantInput[]) =>
-  items.map(({ usd, aud, ...item }) => ({
+  items.map(({ usd, aud, stocked_quantity, ...item }) => ({
     ...item,
+    manage_inventory: true,
     prices: [money(usd, "usd"), money(aud, "aud")],
+    metadata: {
+      seeded_stocked_quantity: stocked_quantity ?? 12,
+    },
   }))
+
+const combinationVariants = ({
+  optionTitle,
+  values,
+  sizes,
+  skuPrefix,
+  usd,
+  aud,
+}: {
+  optionTitle: "Graphic" | "Graphic/Color" | "Color"
+  values: string[]
+  sizes: string[]
+  skuPrefix: string
+  usd: number
+  aud: number
+}) =>
+  values.flatMap((value) =>
+    sizes.map((size) => ({
+      title: `${value} / ${size}`,
+      sku: `${skuPrefix}-${value
+        .replace(/[^a-zA-Z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .toUpperCase()}-${size.replace(/[^a-zA-Z0-9]+/g, "").toUpperCase()}`,
+      options: {
+        [optionTitle]: value,
+        Size: size,
+      },
+      usd,
+      aud,
+    }))
+  )
+
+const snowboardCategory = "Snowboards"
+
+const catalogProducts: ProductSeedInput[] = [
+  {
+    title: "Cloud Suntt Regular Snowboard",
+    subtitle: "Regular series with three graphics.",
+    description:
+      "Regular version with three board graphics/designs. Built for all-mountain carving progression with a balanced medium flex.",
+    handle: "cloud-suntt-regular-snowboard",
+    weight: 3000,
+    categoryName: snowboardCategory,
+    collectionHandle: "cloud-suntt",
+    metadata: {
+      catalog_phase: "phase-2a",
+      brand: "Cloud Suntt",
+      brand_slug: "cloud-suntt",
+      series: "Regular",
+      terrain: "All Mountain / Carving",
+      flex: "Medium",
+      level: "Intermediate",
+      note: "Custom board graphics may be added later with an additional customization fee.",
+    },
+    options: [
+      {
+        title: "Graphic",
+        values: ["Graphic 1", "Graphic 2", "Graphic 3"],
+      },
+      {
+        title: "Size",
+        values: ["146cm", "151cm", "154cm", "155cm", "160cm"],
+      },
+    ],
+    variants: combinationVariants({
+      optionTitle: "Graphic",
+      values: ["Graphic 1", "Graphic 2", "Graphic 3"],
+      sizes: ["146cm", "151cm", "154cm", "155cm", "160cm"],
+      skuPrefix: "CS-REG",
+      usd: 399,
+      aud: 609,
+    }),
+  },
+  {
+    title: "Cloud Suntt SUN Wide Snowboard",
+    subtitle: "Wide carving and all-mountain series.",
+    description:
+      "SUN Wide series with one graphic, a wider platform, and a confident carving-oriented ride.",
+    handle: "cloud-suntt-sun-wide-snowboard",
+    weight: 3200,
+    categoryName: snowboardCategory,
+    collectionHandle: "cloud-suntt",
+    metadata: {
+      catalog_phase: "phase-2a",
+      brand: "Cloud Suntt",
+      brand_slug: "cloud-suntt",
+      series: "SUN Wide",
+      terrain: "Carving / All Mountain",
+      width: "Wide",
+      level: "Intermediate / Advanced",
+    },
+    options: [
+      {
+        title: "Graphic",
+        values: ["SUN Graphic"],
+      },
+      {
+        title: "Size",
+        values: ["151cm", "154cm", "158cm"],
+      },
+    ],
+    variants: combinationVariants({
+      optionTitle: "Graphic",
+      values: ["SUN Graphic"],
+      sizes: ["151cm", "154cm", "158cm"],
+      skuPrefix: "CS-SUN-WIDE",
+      usd: 449,
+      aud: 689,
+    }),
+  },
+  {
+    title: "Cloud Suntt TT Carving Hammerhead Snowboard",
+    subtitle: "Directional hammerhead carving board.",
+    description:
+      "TT directional carving hammerhead board for advanced riders who want strong edge hold and a focused carving shape.",
+    handle: "cloud-suntt-tt-carving-hammerhead-snowboard",
+    weight: 3300,
+    categoryName: snowboardCategory,
+    collectionHandle: "cloud-suntt",
+    metadata: {
+      catalog_phase: "phase-2a",
+      brand: "Cloud Suntt",
+      brand_slug: "cloud-suntt",
+      series: "TT",
+      terrain: "Directional Carving",
+      shape: "Hammerhead",
+      level: "Advanced",
+    },
+    options: [
+      {
+        title: "Graphic",
+        values: ["TT Graphic"],
+      },
+      {
+        title: "Size",
+        values: ["160cm"],
+      },
+    ],
+    variants: combinationVariants({
+      optionTitle: "Graphic",
+      values: ["TT Graphic"],
+      sizes: ["160cm"],
+      skuPrefix: "CS-TT",
+      usd: 529,
+      aud: 809,
+    }),
+  },
+  // TODO: Add Cloud Suntt Pro Snowboard after confirmed graphics, sizes, pricing, and specs are provided.
+  {
+    title: "Maibk Sugar Snowboard",
+    subtitle: "Soft-medium park and all-mountain board.",
+    description:
+      "Currently the main Maibk model, with trendy colorways and an approachable softer-flex ride for park and all-mountain progression.",
+    handle: "maibk-sugar-snowboard",
+    weight: 2850,
+    categoryName: snowboardCategory,
+    collectionHandle: "maibk",
+    metadata: {
+      catalog_phase: "phase-2a",
+      brand: "Maibk",
+      brand_slug: "maibk",
+      series: "Sugar",
+      terrain: "Park / All Mountain",
+      flex: "Soft-Medium",
+      level: "Beginner / Intermediate",
+    },
+    options: [
+      {
+        title: "Graphic/Color",
+        values: ["Purple", "Pink", "Black"],
+      },
+      {
+        title: "Size",
+        values: ["135cm", "140cm", "146cm", "147cm", "150cm", "151cm"],
+      },
+    ],
+    variants: combinationVariants({
+      optionTitle: "Graphic/Color",
+      values: ["Purple", "Pink", "Black"],
+      sizes: ["135cm", "140cm", "146cm", "147cm", "150cm", "151cm"],
+      skuPrefix: "MAIBK-SUGAR",
+      usd: 319,
+      aud: 489,
+    }),
+  },
+  {
+    title: "Cosone Duck Stance Carving Snowboard",
+    subtitle: "Placeholder duck-stance carving model.",
+    description:
+      "A Cosone duck-stance carving snowboard placeholder. Exact graphics, colors, sizes, and detailed specs are coming soon.",
+    handle: "cosone-duck-stance-carving-snowboard",
+    weight: 3000,
+    categoryName: snowboardCategory,
+    collectionHandle: "cosone",
+    metadata: {
+      catalog_phase: "phase-2a",
+      brand: "Cosone",
+      brand_slug: "cosone",
+      series: "Duck Stance Carving",
+      terrain: "Carving",
+      details_pending: true,
+    },
+    options: [
+      {
+        title: "Graphic/Color",
+        values: ["TBD"],
+      },
+      {
+        title: "Size",
+        values: ["TBD"],
+      },
+    ],
+    variants: [
+      {
+        title: "TBD / TBD",
+        sku: "COSONE-DUCK-TBD",
+        options: {
+          "Graphic/Color": "TBD",
+          Size: "TBD",
+        },
+        usd: 299,
+        aud: 459,
+        stocked_quantity: 0,
+      },
+    ],
+  },
+  {
+    title: "Cosone Directional Carving Snowboard",
+    subtitle: "Placeholder directional carving model.",
+    description:
+      "A Cosone directional carving snowboard placeholder. Exact graphics, colors, sizes, and detailed specs are coming soon.",
+    handle: "cosone-directional-carving-snowboard",
+    weight: 3100,
+    categoryName: snowboardCategory,
+    collectionHandle: "cosone",
+    metadata: {
+      catalog_phase: "phase-2a",
+      brand: "Cosone",
+      brand_slug: "cosone",
+      series: "Directional Carving",
+      terrain: "Directional Carving",
+      details_pending: true,
+    },
+    options: [
+      {
+        title: "Graphic/Color",
+        values: ["TBD"],
+      },
+      {
+        title: "Size",
+        values: ["TBD"],
+      },
+    ],
+    variants: [
+      {
+        title: "TBD / TBD",
+        sku: "COSONE-DIR-TBD",
+        options: {
+          "Graphic/Color": "TBD",
+          Size: "TBD",
+        },
+        usd: 299,
+        aud: 459,
+        stocked_quantity: 0,
+      },
+    ],
+  },
+  {
+    title: "Cosone Kids Snowboard",
+    subtitle: "Placeholder kids progression model.",
+    description:
+      "A Cosone kids snowboard placeholder for young riders. Exact graphics, colors, sizes, and detailed specs are coming soon.",
+    handle: "cosone-kids-snowboard",
+    weight: 2200,
+    categoryName: snowboardCategory,
+    collectionHandle: "cosone",
+    metadata: {
+      catalog_phase: "phase-2a",
+      brand: "Cosone",
+      brand_slug: "cosone",
+      series: "Kids",
+      terrain: "Progression",
+      details_pending: true,
+    },
+    options: [
+      {
+        title: "Graphic/Color",
+        values: ["TBD"],
+      },
+      {
+        title: "Size",
+        values: ["TBD"],
+      },
+    ],
+    variants: [
+      {
+        title: "TBD / TBD",
+        sku: "COSONE-KIDS-TBD",
+        options: {
+          "Graphic/Color": "TBD",
+          Size: "TBD",
+        },
+        usd: 219,
+        aud: 339,
+        stocked_quantity: 0,
+      },
+    ],
+  },
+  {
+    title: "Cosone Powder Snowboard",
+    subtitle: "Placeholder powder model.",
+    description:
+      "A Cosone powder snowboard placeholder for float-focused riding. Exact graphics, colors, sizes, and detailed specs are coming soon.",
+    handle: "cosone-powder-snowboard",
+    weight: 3100,
+    categoryName: snowboardCategory,
+    collectionHandle: "cosone",
+    metadata: {
+      catalog_phase: "phase-2a",
+      brand: "Cosone",
+      brand_slug: "cosone",
+      series: "Powder",
+      terrain: "Powder",
+      details_pending: true,
+    },
+    options: [
+      {
+        title: "Graphic/Color",
+        values: ["TBD"],
+      },
+      {
+        title: "Size",
+        values: ["TBD"],
+      },
+    ],
+    variants: [
+      {
+        title: "TBD / TBD",
+        sku: "COSONE-POWDER-TBD",
+        options: {
+          "Graphic/Color": "TBD",
+          Size: "TBD",
+        },
+        usd: 299,
+        aud: 459,
+        stocked_quantity: 0,
+      },
+    ],
+  },
+  {
+    title: "Storm Shell Jacket",
+    subtitle: "Simple waterproof shell placeholder.",
+    description:
+      "A mountain-ready shell jacket placeholder for the clothing catalog.",
+    handle: "storm-shell-jacket",
+    weight: 900,
+    categoryName: "Jackets",
+    metadata: {
+      catalog_phase: "phase-2a",
+      product_group: "clothing",
+      product_type: "Jackets",
+      series: "Storm Shell",
+    },
+    options: [
+      {
+        title: "Color",
+        values: ["Black"],
+      },
+      {
+        title: "Size",
+        values: ["S", "M", "L", "XL"],
+      },
+    ],
+    variants: combinationVariants({
+      optionTitle: "Color",
+      values: ["Black"],
+      sizes: ["S", "M", "L", "XL"],
+      skuPrefix: "YNF-JACKET-STORM",
+      usd: 189,
+      aud: 289,
+    }),
+  },
+  {
+    title: "Snow Pants",
+    subtitle: "Simple snowboard pants placeholder.",
+    description:
+      "Durable snow pants placeholder for the clothing catalog.",
+    handle: "snow-pants",
+    weight: 800,
+    categoryName: "Pants",
+    metadata: {
+      catalog_phase: "phase-2a",
+      product_group: "clothing",
+      product_type: "Pants",
+      series: "Snow Pants",
+    },
+    options: [
+      {
+        title: "Color",
+        values: ["Black"],
+      },
+      {
+        title: "Size",
+        values: ["S", "M", "L", "XL"],
+      },
+    ],
+    variants: combinationVariants({
+      optionTitle: "Color",
+      values: ["Black"],
+      sizes: ["S", "M", "L", "XL"],
+      skuPrefix: "YNF-PANTS-SNOW",
+      usd: 149,
+      aud: 229,
+    }),
+  },
+  {
+    title: "Jacket + Pant Set",
+    subtitle: "Simple outerwear set placeholder.",
+    description:
+      "A practical jacket and pant set placeholder for riders building a full kit.",
+    handle: "jacket-pant-set",
+    weight: 1600,
+    categoryName: "Jacket + Pant Sets",
+    metadata: {
+      catalog_phase: "phase-2a",
+      product_group: "clothing",
+      product_type: "Jacket + Pant Sets",
+      series: "Outerwear Set",
+    },
+    options: [
+      {
+        title: "Color",
+        values: ["Black"],
+      },
+      {
+        title: "Size",
+        values: ["S", "M", "L", "XL"],
+      },
+    ],
+    variants: combinationVariants({
+      optionTitle: "Color",
+      values: ["Black"],
+      sizes: ["S", "M", "L", "XL"],
+      skuPrefix: "YNF-SET",
+      usd: 299,
+      aud: 459,
+    }),
+  },
+  {
+    title: "Waxing Iron Kit",
+    subtitle: "Simple waxing tool kit.",
+    description:
+      "A local placeholder kit for maintaining snowboard bases at home.",
+    handle: "waxing-iron-kit",
+    weight: 1200,
+    categoryName: "Waxing Tools",
+    metadata: {
+      catalog_phase: "phase-2a",
+      product_group: "accessories",
+      product_type: "Waxing Tools",
+      series: "Waxing Iron Kit",
+    },
+    options: [{ title: "Style", values: ["Standard Kit"] }],
+    variants: [
+      {
+        title: "Standard Kit",
+        sku: "YNF-WAX-IRON-KIT",
+        options: { Style: "Standard Kit" },
+        usd: 69,
+        aud: 105,
+      },
+    ],
+  },
+  {
+    title: "All-Temperature Wax",
+    subtitle: "Everyday snowboard wax.",
+    description:
+      "All-temperature snowboard wax placeholder for regular base care.",
+    handle: "all-temperature-wax",
+    weight: 200,
+    categoryName: "Waxing Tools",
+    metadata: {
+      catalog_phase: "phase-2a",
+      product_group: "accessories",
+      product_type: "Waxing Tools",
+      series: "All-Temperature Wax",
+    },
+    options: [{ title: "Style", values: ["120g Bar"] }],
+    variants: [
+      {
+        title: "120g Bar",
+        sku: "YNF-WAX-ALL-TEMP",
+        options: { Style: "120g Bar" },
+        usd: 18,
+        aud: 28,
+      },
+    ],
+  },
+  {
+    title: "Snowboard Stomp Pad",
+    subtitle: "Simple traction pad.",
+    description:
+      "A clear stomp pad placeholder for one-foot skating and lift exits.",
+    handle: "snowboard-stomp-pad",
+    weight: 120,
+    categoryName: "Stomp Pads",
+    metadata: {
+      catalog_phase: "phase-2a",
+      product_group: "accessories",
+      product_type: "Stomp Pads",
+      series: "Stomp Pad",
+    },
+    options: [{ title: "Color", values: ["Clear"] }],
+    variants: [
+      {
+        title: "Clear",
+        sku: "YNF-STOMP-CLEAR",
+        options: { Color: "Clear" },
+        usd: 15,
+        aud: 23,
+      },
+    ],
+  },
+  {
+    title: "Edge Tuning Tool",
+    subtitle: "Simple edge maintenance tool.",
+    description:
+      "A compact edge tuning tool placeholder for keeping carving boards sharp.",
+    handle: "edge-tuning-tool",
+    weight: 250,
+    categoryName: "Waxing Tools",
+    metadata: {
+      catalog_phase: "phase-2a",
+      product_group: "accessories",
+      product_type: "Waxing Tools",
+      series: "Edge Tuning Tool",
+    },
+    options: [{ title: "Style", values: ["Standard Tool"] }],
+    variants: [
+      {
+        title: "Standard Tool",
+        sku: "YNF-EDGE-TOOL",
+        options: { Style: "Standard Tool" },
+        usd: 29,
+        aud: 45,
+      },
+    ],
+  },
+]
+
+const brandCollections = [
+  {
+    title: "Cloud Suntt",
+    handle: "cloud-suntt",
+    metadata: {
+      brand_slug: "cloud-suntt",
+    },
+  },
+  {
+    title: "Maibk",
+    handle: "maibk",
+    metadata: {
+      brand_slug: "maibk",
+    },
+  },
+  {
+    title: "Cosone",
+    handle: "cosone",
+    metadata: {
+      brand_slug: "cosone",
+    },
+  },
+]
+
+const categoryTree = [
+  {
+    name: "Snowboards",
+    children: [],
+  },
+  {
+    name: "Clothing",
+    children: ["Jackets", "Pants", "Jacket + Pant Sets"],
+  },
+  {
+    name: "Accessories",
+    children: [
+      "Waxing Tools",
+      "Stomp Pads",
+      "Goggles",
+      "Helmets",
+      "Protection",
+    ],
+  },
+]
+
+async function queryAll(
+  query: any,
+  entity: string,
+  fields: string[]
+): Promise<SeedRecord[]> {
+  const { data } = await query.graph({
+    entity,
+    fields,
+  })
+
+  return data || []
+}
+
+async function ensureCategories(
+  container: MedusaContainer,
+  query: any
+) {
+  let categories = await queryAll(query, "product_category", [
+    "id",
+    "name",
+    "handle",
+    "parent_category_id",
+  ])
+
+  const byName = () =>
+    new Map<string, any>(categories.map((category) => [category.name, category]))
+
+  const missingParents = categoryTree
+    .filter((category) => !byName().has(category.name))
+    .map((category) => ({
+      name: category.name,
+      handle: category.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      is_active: true,
+    }))
+
+  if (missingParents.length) {
+    await createProductCategoriesWorkflow(container).run({
+      input: {
+        product_categories: missingParents,
+      },
+    })
+    categories = await queryAll(query, "product_category", [
+      "id",
+      "name",
+      "handle",
+      "parent_category_id",
+    ])
+  }
+
+  const categoryMap = byName()
+  const missingChildren = categoryTree.flatMap((parent) => {
+    const parentCategory = categoryMap.get(parent.name)
+
+    return parent.children
+      .filter((child) => !categoryMap.has(child))
+      .map((child) => ({
+        name: child,
+        handle: child.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+        is_active: true,
+        parent_category_id: parentCategory?.id,
+      }))
+  })
+
+  if (missingChildren.length) {
+    await createProductCategoriesWorkflow(container).run({
+      input: {
+        product_categories: missingChildren,
+      },
+    })
+    categories = await queryAll(query, "product_category", [
+      "id",
+      "name",
+      "handle",
+      "parent_category_id",
+    ])
+  }
+
+  return new Map<string, string>(
+    categories.map((category) => [category.name, category.id])
+  )
+}
+
+async function ensureCollections(
+  container: MedusaContainer,
+  query: any
+) {
+  let collections = await queryAll(query, "product_collection", [
+    "id",
+    "title",
+    "handle",
+  ])
+
+  const missing = brandCollections.filter(
+    (collection) =>
+      !collections.some((item) => item.handle === collection.handle)
+  )
+
+  if (missing.length) {
+    await createCollectionsWorkflow(container).run({
+      input: {
+        collections: missing,
+      },
+    })
+    collections = await queryAll(query, "product_collection", [
+      "id",
+      "title",
+      "handle",
+    ])
+  }
+
+  return new Map<string, string>(
+    collections.map((collection) => [collection.handle, collection.id])
+  )
+}
 
 export default async function seed({
   container,
@@ -55,34 +781,60 @@ export default async function seed({
     ModuleRegistrationName.FULFILLMENT
   )
 
-  logger.info("Seeding Yournextfit local store data...")
+  logger.info("Seeding Yournextfit Phase 2A catalog data...")
 
-  const {
-    result: [salesChannel],
-  } = await createSalesChannelsWorkflow(container).run({
-    input: {
-      salesChannelsData: [
-        {
-          name: "Yournextfit Online Store",
-          description: "Default local sales channel for the storefront.",
-        },
-      ],
-    },
-  })
+  const existingSalesChannels = await queryAll(query, "sales_channel", [
+    "id",
+    "name",
+  ])
+  let salesChannel = existingSalesChannels.find(
+    (channel) => channel.name === "Yournextfit Online Store"
+  )
 
-  const {
-    result: [publishableApiKey],
-  } = await createApiKeysWorkflow(container).run({
-    input: {
-      api_keys: [
-        {
-          title: "Yournextfit Storefront Publishable Key",
-          type: "publishable",
-          created_by: "seed",
-        },
-      ],
-    },
-  })
+  if (!salesChannel) {
+    const {
+      result: [createdSalesChannel],
+    } = await createSalesChannelsWorkflow(container).run({
+      input: {
+        salesChannelsData: [
+          {
+            name: "Yournextfit Online Store",
+            description: "Default local sales channel for the storefront.",
+          },
+        ],
+      },
+    })
+    salesChannel = createdSalesChannel
+  }
+
+  const existingApiKeys = await queryAll(query, "api_key", [
+    "id",
+    "title",
+    "token",
+    "type",
+  ])
+  let publishableApiKey = existingApiKeys.find(
+    (key) =>
+      key.title === "Yournextfit Storefront Publishable Key" &&
+      key.type === "publishable"
+  )
+
+  if (!publishableApiKey) {
+    const {
+      result: [createdPublishableApiKey],
+    } = await createApiKeysWorkflow(container).run({
+      input: {
+        api_keys: [
+          {
+            title: "Yournextfit Storefront Publishable Key",
+            type: "publishable",
+            created_by: "seed",
+          },
+        ],
+      },
+    })
+    publishableApiKey = createdPublishableApiKey
+  }
 
   await linkSalesChannelsToApiKeyWorkflow(container).run({
     input: {
@@ -91,97 +843,117 @@ export default async function seed({
     },
   })
 
-  await createStoresWorkflow(container).run({
-    input: {
-      stores: [
-        {
-          name: "Yournextfit",
-          supported_currencies: [
-            {
-              currency_code: "usd",
-              is_default: true,
-            },
-            {
-              currency_code: "aud",
-              is_default: false,
-            },
-          ],
-          default_sales_channel_id: salesChannel.id,
-        },
-      ],
-    },
-  })
+  const existingStores = await queryAll(query, "store", ["id", "name"])
+  if (!existingStores.some((store) => store.name === "Yournextfit")) {
+    await createStoresWorkflow(container).run({
+      input: {
+        stores: [
+          {
+            name: "Yournextfit",
+            supported_currencies: [
+              {
+                currency_code: "usd",
+                is_default: true,
+              },
+              {
+                currency_code: "aud",
+                is_default: false,
+              },
+            ],
+            default_sales_channel_id: salesChannel.id,
+          },
+        ],
+      },
+    })
+  }
 
   const countries = ["us", "au"]
+  const existingRegions = await queryAll(query, "region", [
+    "id",
+    "name",
+    "currency_code",
+  ])
+  let region = existingRegions.find((item) => item.name === "United States")
 
-  const {
-    result: [region],
-  } = await createRegionsWorkflow(container).run({
-    input: {
-      regions: [
-        {
-          name: "United States",
-          currency_code: "usd",
-          countries,
-          payment_providers: ["pp_system_default"],
-        },
-      ],
-    },
-  })
-
-  await createTaxRegionsWorkflow(container).run({
-    input: countries.map((country_code) => ({
-      country_code,
-      provider_id: "tp_system",
-    })),
-  })
-
-  const {
-    result: [stockLocation],
-  } = await createStockLocationsWorkflow(container).run({
-    input: {
-      locations: [
-        {
-          name: "Yournextfit Local Warehouse",
-          address: {
-            address_1: "Local development warehouse",
-            city: "Denver",
-            country_code: "US",
+  if (!region) {
+    const {
+      result: [createdRegion],
+    } = await createRegionsWorkflow(container).run({
+      input: {
+        regions: [
+          {
+            name: "United States",
+            currency_code: "usd",
+            countries,
+            payment_providers: ["pp_system_default"],
           },
-        },
-      ],
-    },
-  })
-
-  await link.create({
-    [Modules.STOCK_LOCATION]: {
-      stock_location_id: stockLocation.id,
-    },
-    [Modules.FULFILLMENT]: {
-      fulfillment_provider_id: "manual_manual",
-    },
-  })
-
-  const fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
-    name: "Yournextfit Warehouse Shipping",
-    type: "shipping",
-    service_zones: [
-      {
-        name: "US and Australia",
-        geo_zones: countries.map((country_code) => ({
-          country_code,
-          type: "country" as const,
-        })),
+        ],
       },
-    ],
-  })
+    })
+    region = createdRegion
+  }
 
-  await link.create({
-    [Modules.STOCK_LOCATION]: {
-      stock_location_id: stockLocation.id,
-    },
-    [Modules.FULFILLMENT]: {
-      fulfillment_set_id: fulfillmentSet.id,
+  const existingTaxRegions = await queryAll(query, "tax_region", [
+    "id",
+    "country_code",
+  ])
+  const existingTaxCountries = new Set(
+    existingTaxRegions.map((item) => item.country_code)
+  )
+  const missingTaxRegions = countries.filter(
+    (countryCode) => !existingTaxCountries.has(countryCode)
+  )
+
+  if (missingTaxRegions.length) {
+    await createTaxRegionsWorkflow(container).run({
+      input: missingTaxRegions.map((country_code) => ({
+        country_code,
+        provider_id: "tp_system",
+      })),
+    })
+  }
+
+  const existingStockLocations = await queryAll(query, "stock_location", [
+    "id",
+    "name",
+  ])
+  let stockLocation = existingStockLocations.find(
+    (location) => location.name === "Yournextfit Local Warehouse"
+  )
+
+  if (!stockLocation) {
+    const {
+      result: [createdStockLocation],
+    } = await createStockLocationsWorkflow(container).run({
+      input: {
+        locations: [
+          {
+            name: "Yournextfit Local Warehouse",
+            address: {
+              address_1: "Local development warehouse",
+              city: "Denver",
+              country_code: "US",
+            },
+          },
+        ],
+      },
+    })
+    stockLocation = createdStockLocation
+
+    await link.create({
+      [Modules.STOCK_LOCATION]: {
+        stock_location_id: stockLocation.id,
+      },
+      [Modules.FULFILLMENT]: {
+        fulfillment_provider_id: "manual_manual",
+      },
+    })
+  }
+
+  await linkSalesChannelsToStockLocationWorkflow(container).run({
+    input: {
+      id: stockLocation.id,
+      add: [salesChannel.id],
     },
   })
 
@@ -191,394 +963,141 @@ export default async function seed({
   })
   const shippingProfile = shippingProfileResult[0]
 
-  await createShippingOptionsWorkflow(container).run({
-    input: [
-      {
-        name: "Standard Ground",
-        price_type: "flat",
-        provider_id: "manual_manual",
-        service_zone_id: fulfillmentSet.service_zones[0].id,
-        shipping_profile_id: shippingProfile.id,
-        type: {
-          label: "Standard",
-          description: "Local development flat-rate shipping.",
-          code: "standard",
-        },
-        prices: [
-          money(12, "usd"),
-          money(18, "aud"),
+  const existingShippingOptions = await queryAll(query, "shipping_option", [
+    "id",
+    "name",
+  ])
+
+  if (
+    !existingShippingOptions.some((option) => option.name === "Standard Ground")
+  ) {
+    const fulfillmentSet =
+      await fulfillmentModuleService.createFulfillmentSets({
+        name: "Yournextfit Warehouse Shipping",
+        type: "shipping",
+        service_zones: [
           {
-            region_id: region.id,
-            amount: 12,
+            name: "US and Australia",
+            geo_zones: countries.map((country_code) => ({
+              country_code,
+              type: "country" as const,
+            })),
           },
         ],
-        rules: [
-          {
-            attribute: "enabled_in_store",
-            value: "true",
-            operator: "eq",
-          },
-          {
-            attribute: "is_return",
-            value: "false",
-            operator: "eq",
-          },
-        ],
+      })
+
+    await link.create({
+      [Modules.STOCK_LOCATION]: {
+        stock_location_id: stockLocation.id,
       },
-    ],
-  })
+      [Modules.FULFILLMENT]: {
+        fulfillment_set_id: fulfillmentSet.id,
+      },
+    })
 
-  await linkSalesChannelsToStockLocationWorkflow(container).run({
-    input: {
-      id: stockLocation.id,
-      add: [salesChannel.id],
-    },
-  })
-
-  const { result: categories } = await createProductCategoriesWorkflow(
-    container
-  ).run({
-    input: {
-      product_categories: [
-        "Snowboards",
-        "Boots",
-        "Bindings",
-        "Outerwear",
-        "Accessories",
-        "Badminton",
-      ].map((name) => ({
-        name,
-        is_active: true,
-      })),
-    },
-  })
-
-  const categoryId = (name: string) =>
-    categories.find((category) => category.name === name)!.id
-
-  const { result: productOptions } = await createProductOptionsWorkflow(
-    container
-  ).run({
-    input: {
-      product_options: [
+    await createShippingOptionsWorkflow(container).run({
+      input: [
         {
-          title: "Length",
-          values: ["150 cm", "154 cm", "158 cm", "162 cm"],
-        },
-        {
-          title: "Size",
-          values: ["S", "M", "L", "XL", "8", "9", "10", "11"],
-        },
-        {
-          title: "Color",
-          values: ["Black", "White", "Slate", "Pine", "Storm Blue"],
-        },
-        {
-          title: "Flex",
-          values: ["Soft", "Medium", "Stiff"],
-        },
-        {
-          title: "Terrain",
-          values: ["Powder", "All-Mountain", "Park"],
-        },
-        {
-          title: "Gender",
-          values: ["Unisex", "Women", "Men"],
+          name: "Standard Ground",
+          price_type: "flat",
+          provider_id: "manual_manual",
+          service_zone_id: fulfillmentSet.service_zones[0].id,
+          shipping_profile_id: shippingProfile.id,
+          type: {
+            label: "Standard",
+            description: "Local development flat-rate shipping.",
+            code: "standard",
+          },
+          prices: [
+            money(12, "usd"),
+            money(18, "aud"),
+            {
+              region_id: region.id,
+              amount: 12,
+            },
+          ],
+          rules: [
+            {
+              attribute: "enabled_in_store",
+              value: "true",
+              operator: "eq",
+            },
+            {
+              attribute: "is_return",
+              value: "false",
+              operator: "eq",
+            },
+          ],
         },
       ],
-    },
-  })
+    })
+  }
 
-  const option = (title: string) => ({
-    id: productOptions.find((item) => item.title === title)!.id,
-  })
+  const categories = await ensureCategories(container, query)
+  const collections = await ensureCollections(container, query)
+  const existingProducts = await queryAll(query, "product", ["id", "handle"])
+  const existingHandles = new Set(
+    existingProducts.map((product) => product.handle)
+  )
 
-  await createProductsWorkflow(container).run({
-    input: {
-      products: [
-        {
-          title: "Yournextfit Powder Twin Snowboard",
-          subtitle: "Directional twin for soft landings and deep days.",
-          description:
-            "A buoyant powder board with a stable twin feel, medium flex, and a wide nose for playful storm days.",
-          handle: "yournextfit-powder-twin-snowboard",
-          weight: 3200,
-          status: ProductStatus.PUBLISHED,
-          category_ids: [categoryId("Snowboards")],
-          shipping_profile_id: shippingProfile.id,
-          images: [{ url: imageUrl }],
-          options: [option("Length"), option("Flex"), option("Terrain")],
-          variants: variants([
-            {
-              title: "154 cm / Medium / Powder",
-              sku: "YNF-SB-POW-154",
-              options: {
-                Length: "154 cm",
-                Flex: "Medium",
-                Terrain: "Powder",
-              },
-              usd: 549,
-              aud: 839,
-            },
-            {
-              title: "158 cm / Medium / Powder",
-              sku: "YNF-SB-POW-158",
-              options: {
-                Length: "158 cm",
-                Flex: "Medium",
-                Terrain: "Powder",
-              },
-              usd: 549,
-              aud: 839,
-            },
-          ]),
-          sales_channels: [{ id: salesChannel.id }],
-        },
-        {
-          title: "Yournextfit All-Mountain Carbon Snowboard",
-          subtitle: "Lightweight response for carving, trees, and chop.",
-          description:
-            "A stiff carbon-reinforced board built for fast edge changes and confident all-mountain riding.",
-          handle: "yournextfit-all-mountain-carbon-snowboard",
-          weight: 3000,
-          status: ProductStatus.PUBLISHED,
-          category_ids: [categoryId("Snowboards")],
-          shipping_profile_id: shippingProfile.id,
-          images: [{ url: imageUrl }],
-          options: [option("Length"), option("Flex"), option("Terrain")],
-          variants: variants([
-            {
-              title: "158 cm / Stiff / All-Mountain",
-              sku: "YNF-SB-CAR-158",
-              options: {
-                Length: "158 cm",
-                Flex: "Stiff",
-                Terrain: "All-Mountain",
-              },
-              usd: 629,
-              aud: 969,
-            },
-            {
-              title: "162 cm / Stiff / All-Mountain",
-              sku: "YNF-SB-CAR-162",
-              options: {
-                Length: "162 cm",
-                Flex: "Stiff",
-                Terrain: "All-Mountain",
-              },
-              usd: 629,
-              aud: 969,
-            },
-          ]),
-          sales_channels: [{ id: salesChannel.id }],
-        },
-        {
-          title: "Yournextfit Park Flex Snowboard",
-          subtitle: "Soft flex for rails, side hits, and spring laps.",
-          description:
-            "A forgiving park board with a soft twin profile for freestyle progression and easy presses.",
-          handle: "yournextfit-park-flex-snowboard",
-          weight: 2900,
-          status: ProductStatus.PUBLISHED,
-          category_ids: [categoryId("Snowboards")],
-          shipping_profile_id: shippingProfile.id,
-          images: [{ url: imageUrl }],
-          options: [option("Length"), option("Flex"), option("Terrain")],
-          variants: variants([
-            {
-              title: "150 cm / Soft / Park",
-              sku: "YNF-SB-PARK-150",
-              options: {
-                Length: "150 cm",
-                Flex: "Soft",
-                Terrain: "Park",
-              },
-              usd: 429,
-              aud: 659,
-            },
-            {
-              title: "154 cm / Soft / Park",
-              sku: "YNF-SB-PARK-154",
-              options: {
-                Length: "154 cm",
-                Flex: "Soft",
-                Terrain: "Park",
-              },
-              usd: 429,
-              aud: 659,
-            },
-          ]),
-          sales_channels: [{ id: salesChannel.id }],
-        },
-        {
-          title: "Alpine Fit Snowboard Boots",
-          subtitle: "Supportive boots for cold resort days.",
-          description:
-            "Warm medium-flex boots with a supportive liner and easy all-day fit.",
-          handle: "alpine-fit-snowboard-boots",
-          weight: 1800,
-          status: ProductStatus.PUBLISHED,
-          category_ids: [categoryId("Boots")],
-          shipping_profile_id: shippingProfile.id,
-          images: [{ url: imageUrl }],
-          options: [option("Size"), option("Gender"), option("Color")],
-          variants: variants([
-            {
-              title: "9 / Unisex / Black",
-              sku: "YNF-BT-AF-9-BLK",
-              options: {
-                Size: "9",
-                Gender: "Unisex",
-                Color: "Black",
-              },
-              usd: 249,
-              aud: 379,
-            },
-            {
-              title: "10 / Unisex / Black",
-              sku: "YNF-BT-AF-10-BLK",
-              options: {
-                Size: "10",
-                Gender: "Unisex",
-                Color: "Black",
-              },
-              usd: 249,
-              aud: 379,
-            },
-          ]),
-          sales_channels: [{ id: salesChannel.id }],
-        },
-        {
-          title: "Carbon Response Bindings",
-          subtitle: "Fast edge response with a damp ride.",
-          description:
-            "Lightweight bindings with a responsive highback and simple tool-free adjustments.",
-          handle: "carbon-response-bindings",
-          weight: 1200,
-          status: ProductStatus.PUBLISHED,
-          category_ids: [categoryId("Bindings")],
-          shipping_profile_id: shippingProfile.id,
-          images: [{ url: imageUrl }],
-          options: [option("Size"), option("Color"), option("Flex")],
-          variants: variants([
-            {
-              title: "M / Black / Stiff",
-              sku: "YNF-BD-CR-M-BLK",
-              options: {
-                Size: "M",
-                Color: "Black",
-                Flex: "Stiff",
-              },
-              usd: 279,
-              aud: 429,
-            },
-            {
-              title: "L / Black / Stiff",
-              sku: "YNF-BD-CR-L-BLK",
-              options: {
-                Size: "L",
-                Color: "Black",
-                Flex: "Stiff",
-              },
-              usd: 279,
-              aud: 429,
-            },
-          ]),
-          sales_channels: [{ id: salesChannel.id }],
-        },
-        {
-          title: "Storm Shell Jacket",
-          subtitle: "Waterproof shell for mountain weather.",
-          description:
-            "A lightweight waterproof shell with helmet-compatible hood and clean freeride styling.",
-          handle: "storm-shell-jacket",
-          weight: 900,
-          status: ProductStatus.PUBLISHED,
-          category_ids: [categoryId("Outerwear")],
-          shipping_profile_id: shippingProfile.id,
-          images: [{ url: imageUrl }],
-          options: [option("Size"), option("Gender"), option("Color")],
-          variants: variants([
-            {
-              title: "M / Men / Storm Blue",
-              sku: "YNF-OW-SS-M-BLU",
-              options: {
-                Size: "M",
-                Gender: "Men",
-                Color: "Storm Blue",
-              },
-              usd: 319,
-              aud: 489,
-            },
-            {
-              title: "L / Men / Storm Blue",
-              sku: "YNF-OW-SS-L-BLU",
-              options: {
-                Size: "L",
-                Gender: "Men",
-                Color: "Storm Blue",
-              },
-              usd: 319,
-              aud: 489,
-            },
-          ]),
-          sales_channels: [{ id: salesChannel.id }],
-        },
-        {
-          title: "Performance Badminton Racket",
-          subtitle: "Fast frame for weekly court sessions.",
-          description:
-            "A balanced graphite racket for quick doubles exchanges and controlled singles play.",
-          handle: "performance-badminton-racket",
-          weight: 110,
-          status: ProductStatus.PUBLISHED,
-          category_ids: [categoryId("Badminton")],
-          shipping_profile_id: shippingProfile.id,
-          images: [{ url: imageUrl }],
-          options: [option("Color"), option("Flex")],
-          variants: variants([
-            {
-              title: "White / Medium",
-              sku: "YNF-BM-PR-WHT-MED",
-              options: {
-                Color: "White",
-                Flex: "Medium",
-              },
-              usd: 119,
-              aud: 179,
-            },
-            {
-              title: "Pine / Medium",
-              sku: "YNF-BM-PR-PIN-MED",
-              options: {
-                Color: "Pine",
-                Flex: "Medium",
-              },
-              usd: 119,
-              aud: 179,
-            },
-          ]),
-          sales_channels: [{ id: salesChannel.id }],
-        },
-      ],
-    },
-  })
+  const productsToCreate = catalogProducts
+    .filter((product) => !existingHandles.has(product.handle))
+    .map((product) => ({
+      title: product.title,
+      subtitle: product.subtitle,
+      description: product.description,
+      handle: product.handle,
+      weight: product.weight ?? 500,
+      status: ProductStatus.PUBLISHED,
+      category_ids: [categories.get(product.categoryName)!],
+      collection_id: product.collectionHandle
+        ? collections.get(product.collectionHandle)
+        : undefined,
+      shipping_profile_id: shippingProfile.id,
+      metadata: product.metadata,
+      options: product.options,
+      variants: variants(product.variants),
+      sales_channels: [{ id: salesChannel.id }],
+    }))
 
-  const { data: inventoryItems } = await query.graph({
-    entity: "inventory_item",
-    fields: ["id"],
-  })
+  if (productsToCreate.length) {
+    logger.info(`Creating ${productsToCreate.length} Phase 2A products...`)
+    await createProductsWorkflow(container).run({
+      input: {
+        products: productsToCreate,
+      },
+    })
+  } else {
+    logger.info("Phase 2A products already exist; skipping product creation.")
+  }
 
-  await createInventoryLevelsWorkflow(container).run({
-    input: {
-      inventory_levels: inventoryItems.map((item) => ({
-        location_id: stockLocation.id,
-        stocked_quantity: 25,
-        inventory_item_id: item.id,
-      })),
-    },
-  })
+  const inventoryItems = await queryAll(query, "inventory_item", ["id"])
+  const existingInventoryLevels = await queryAll(query, "inventory_level", [
+    "id",
+    "inventory_item_id",
+    "location_id",
+  ])
+  const levelKeys = new Set(
+    existingInventoryLevels.map(
+      (level) => `${level.inventory_item_id}:${level.location_id}`
+    )
+  )
+  const inventoryLevels = inventoryItems
+    .filter((item) => !levelKeys.has(`${item.id}:${stockLocation.id}`))
+    .map((item) => ({
+      location_id: stockLocation.id,
+      stocked_quantity: 12,
+      inventory_item_id: item.id,
+    }))
 
-  logger.info("Seed completed.")
+  if (inventoryLevels.length) {
+    await createInventoryLevelsWorkflow(container).run({
+      input: {
+        inventory_levels: inventoryLevels,
+      },
+    })
+  }
+
+  logger.info("Phase 2A seed completed.")
   logger.info(`Publishable API key: ${publishableApiKey.token}`)
 }

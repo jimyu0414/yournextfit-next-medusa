@@ -1,6 +1,8 @@
 # Yournextfit Next Medusa
 
-Phase 1 local development setup for an independent snowboard and sports ecommerce store powered by Next.js, Medusa v2, PostgreSQL, Redis, Docker Compose, and pnpm.
+Local development setup for an independent snowboard and sports ecommerce store powered by Next.js, Medusa v2, PostgreSQL, Redis, Docker Compose, and pnpm.
+
+Phase 2A focuses the catalog around selected snowboard brands: Cloud Suntt, Maibk, and Cosone. Products are modeled as one snowboard model or series per product, with Graphic/Color and Size represented as options and sellable combinations represented as variants.
 
 This repo is intentionally isolated from other local Drupal/Lando/Docker projects. Docker services use project-specific names, a project-specific network, named volumes, and safer non-default host ports.
 
