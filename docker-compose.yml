@@ -1,0 +1,48 @@
+name: yournextfit-next-medusa
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: yournextfit_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: yournextfit_medusa
+      POSTGRES_USER: medusa
+      POSTGRES_PASSWORD: medusa
+    ports:
+      - "15432:5432"
+    volumes:
+      - yournextfit_postgres_data:/var/lib/postgresql/data
+    networks:
+      - yournextfit_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medusa -d yournextfit_medusa"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: yournextfit_redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "16379:6379"
+    volumes:
+      - yournextfit_redis_data:/data
+    networks:
+      - yournextfit_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  yournextfit_postgres_data:
+  yournextfit_redis_data:
+
+networks:
+  yournextfit_net:
+    name: yournextfit_net
+    driver: bridge

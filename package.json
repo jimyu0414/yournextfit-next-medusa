@@ -1,0 +1,26 @@
+{
+  "name": "yournextfit-next-medusa",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @yournextfit/backend --filter @yournextfit/storefront dev",
+    "build": "pnpm -r build",
+    "backend:dev": "pnpm --filter @yournextfit/backend dev",
+    "backend:build": "pnpm --filter @yournextfit/backend build",
+    "backend:start": "pnpm --filter @yournextfit/backend start",
+    "backend:seed": "pnpm --filter @yournextfit/backend seed",
+    "backend:db:migrate": "pnpm --filter @yournextfit/backend db:migrate",
+    "storefront:dev": "pnpm --filter @yournextfit/storefront dev",
+    "storefront:build": "pnpm --filter @yournextfit/storefront build",
+    "storefront:start": "pnpm --filter @yournextfit/storefront start",
+    "lint": "pnpm -r lint"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.11",
+    "typescript": "6.0.3"
+  }
+}

@@ -1,0 +1,34 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# local env files
+.env
+.env.*
+!.env.example
+!apps/**/.env.example
+
+# Medusa
+apps/backend/.medusa/
+apps/backend/.cache/
+
+# Next.js
+apps/storefront/.next/
+apps/storefront/out/
+
+# build output
+dist/
+build/
+coverage/
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
