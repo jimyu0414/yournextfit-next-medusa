@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { PageShell } from "@/components/PageShell"
 import { brandSummaries } from "@/lib/catalog"
+import styles from "./SnowboardsPage.module.scss"
 
 export default function SnowboardsPage() {
   return (
@@ -10,19 +11,19 @@ export default function SnowboardsPage() {
       eyebrow="Snowboards"
       title="Snowboard Brands"
     >
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className={styles.brandGrid}>
         {brandSummaries.map((brand) => (
           <Link
-            className="flex min-h-[24rem] flex-col justify-between overflow-hidden rounded border border-black/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2"
+            className={styles.brandCard}
             href={brand.href}
             key={brand.slug}
           >
-            <div className="border-b border-black/10 bg-gradient-to-br from-neutral-50 to-teal-50/60 p-5">
-              <div className="flex h-24 items-center justify-center rounded bg-white p-5">
-                <div className="relative h-full w-full">
+            <div className={styles.logoArea}>
+              <div className={styles.logoFrame}>
+                <div className={styles.logoImageWrap}>
                   <Image
                     alt={brand.logoAlt}
-                    className="object-contain"
+                    className={styles.logoImage}
                     fill
                     sizes="(min-width: 768px) 30vw, 80vw"
                     src={brand.logoSrc}
@@ -30,24 +31,14 @@ export default function SnowboardsPage() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-1 flex-col justify-between p-5">
+            <div className={styles.cardBody}>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-800">
-                  Selected brand
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold text-neutral-950">
-                  {brand.name}
-                </h2>
-                <p className="mt-3 text-sm font-semibold leading-6 text-teal-800">
-                  {brand.positioning}
-                </p>
-                <p className="mt-4 text-sm leading-6 text-neutral-600">
-                  {brand.description}
-                </p>
+                <p className={styles.eyebrow}>Selected brand</p>
+                <h2 className={styles.title}>{brand.name}</h2>
+                <p className={styles.positioning}>{brand.positioning}</p>
+                <p className={styles.description}>{brand.description}</p>
               </div>
-              <span className="mt-6 text-sm font-semibold text-neutral-950">
-                Find out more
-              </span>
+              <span className={styles.cardLinkText}>Find out more</span>
             </div>
           </Link>
         ))}

@@ -1,0 +1,30 @@
+@use "tailwindcss";
+
+$page-background: #f7f8f4;
+$page-foreground: #15181c;
+$mountain-glow: rgba(46, 125, 112, 0.14);
+
+:root {
+  --background: #{$page-background};
+  --foreground: #{$page-foreground};
+  --color-surface: #ffffff;
+  --color-surface-soft: rgba(255, 255, 255, 0.8);
+  --color-border: rgba(0, 0, 0, 0.1);
+  --color-brand: #115e59;
+  --color-brand-soft: #f0fdfa;
+  --layout-max-width: 80rem;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, $mountain-glow, transparent 32rem),
+    linear-gradient(180deg, $page-background 0%, #eef3f0 100%);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

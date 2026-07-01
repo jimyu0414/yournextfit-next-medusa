@@ -2,6 +2,7 @@ packages:
   - "apps/*"
 allowBuilds:
   '@medusajs/telemetry': true
+  '@parcel/watcher': false
   '@swc/core': true
   esbuild: true
   msgpackr-extract: true
