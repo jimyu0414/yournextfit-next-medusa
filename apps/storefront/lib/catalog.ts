@@ -61,6 +61,8 @@ export const brandSummaries = [
     name: "Cloud Suntt",
     slug: "cloud-suntt",
     href: "/snowboards/cloud-suntt",
+    logoSrc: "/brands/cloud-suntt-logo.png",
+    logoAlt: "Cloud Suntt logo",
     positioning:
       "Performance-focused carving, wide boards, and advanced freeride progression.",
     description:
@@ -70,6 +72,8 @@ export const brandSummaries = [
     name: "Maibk",
     slug: "maibk",
     href: "/snowboards/maibk",
+    logoSrc: "/brands/maibk-logo.png",
+    logoAlt: "Maibk logo",
     positioning:
       "Trendy, beginner-friendly, softer-flex all-mountain and park boards.",
     description:
@@ -79,6 +83,8 @@ export const brandSummaries = [
     name: "Cosone",
     slug: "cosone",
     href: "/snowboards/cosone",
+    logoSrc: "/brands/cosone-logo.png",
+    logoAlt: "Cosone logo",
     positioning:
       "Affordable value route with carving and progression-focused models.",
     description:
