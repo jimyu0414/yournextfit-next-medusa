@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { StoreOption, StoreVariant, variantPrice } from "@/lib/catalog"
+import styles from "./VariantSelector.module.scss"
 
 function variantOptionMap(variant: StoreVariant) {
   const map = new Map<string, string>()
@@ -56,7 +57,7 @@ export function VariantSelector({
   }
 
   return (
-    <div className="space-y-5">
+    <div className={styles.selector}>
       {options.map((option) => {
         const title = option.title || "Option"
         const values =
@@ -66,21 +67,19 @@ export function VariantSelector({
 
         return (
           <div key={title}>
-            <p className="mb-2 text-sm font-semibold text-neutral-900">
-              {title}
-            </p>
-            <div className="flex flex-wrap gap-2">
+            <p className={styles.optionLabel}>{title}</p>
+            <div className={styles.optionValues}>
               {values.map((value) => {
                 const selected = selection[title] === value
                 const available = isValueAvailable(title, value)
 
                 return (
                   <button
-                    className={`rounded border px-3 py-2 text-sm font-medium transition ${
-                      selected
-                        ? "border-neutral-950 bg-neutral-950 text-white"
-                        : "border-black/15 bg-white text-neutral-800 hover:border-neutral-500"
-                    } ${available ? "" : "opacity-40"}`}
+                    className={[
+                      styles.optionButton,
+                      selected ? styles.optionButtonSelected : "",
+                      available ? "" : styles.optionButtonUnavailable,
+                    ].join(" ")}
                     key={value}
                     onClick={() =>
                       setSelection((current) => ({
@@ -99,21 +98,21 @@ export function VariantSelector({
         )
       })}
 
-      <div className="rounded border border-black/10 bg-white p-4">
+      <div className={styles.selectedPanel}>
         {selectedVariant ? (
-          <div className="space-y-2">
-            <p className="text-sm text-neutral-600">
+          <div className={styles.selectedContent}>
+            <p className={styles.selectedText}>
               Selected variant:{" "}
-              <span className="font-medium text-neutral-950">
+              <span className={styles.selectedVariantTitle}>
                 {selectedVariant.title}
               </span>
             </p>
-            <p className="text-lg font-semibold text-neutral-950">
+            <p className={styles.selectedPrice}>
               {variantPrice(selectedVariant) || "Price coming soon"}
             </p>
           </div>
         ) : (
-          <p className="text-sm leading-6 text-amber-900">
+          <p className={styles.unavailableMessage}>
             That combination is not currently available. Choose another graphic,
             color, or size.
           </p>

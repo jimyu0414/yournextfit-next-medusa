@@ -11,6 +11,7 @@ import {
   sizeValues,
   variantPrice,
 } from "@/lib/catalog"
+import styles from "./ProductPage.module.scss"
 import { VariantSelector } from "./VariantSelector"
 
 export const dynamic = "force-dynamic"
@@ -49,45 +50,39 @@ export default async function ProductPage({
 
   return (
     <PageShell eyebrow={brand} title={product.title}>
-      <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)]">
-        <div className="space-y-6">
-          <div className="relative aspect-[4/3] overflow-hidden rounded border border-black/10 bg-neutral-200">
+      <section className={styles.layout}>
+        <div className={styles.mainColumn}>
+          <div className={styles.imageArea}>
             {product.thumbnail ? (
               <Image
                 alt={product.title}
-                className="object-cover"
+                className={styles.image}
                 fill
                 priority
                 sizes="(min-width: 1024px) 55vw, 100vw"
                 src={product.thumbnail}
               />
             ) : (
-              <div className="flex h-full items-center justify-center px-5 text-center text-sm font-medium text-neutral-500">
+              <div className={styles.imagePlaceholder}>
                 Image coming soon
               </div>
             )}
           </div>
 
-          <div className="rounded border border-black/10 bg-white p-5">
-            <h2 className="text-xl font-semibold text-neutral-950">
-              Product Details
-            </h2>
-            <p className="mt-3 text-base leading-7 text-neutral-700">
+          <div className={styles.detailsPanel}>
+            <h2 className={styles.sectionTitle}>Product Details</h2>
+            <p className={styles.description}>
               {product.description}
             </p>
             {metadataEntries.length ? (
-              <dl className="mt-5 grid gap-3 sm:grid-cols-2">
+              <dl className={styles.metadataGrid}>
                 {metadataEntries.map(([label, value]) => (
                   <div
-                    className="rounded border border-black/10 bg-neutral-50 px-4 py-3"
+                    className={styles.metadataItem}
                     key={label}
                   >
-                    <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-neutral-500">
-                      {label}
-                    </dt>
-                    <dd className="mt-1 text-sm font-medium text-neutral-900">
-                      {value}
-                    </dd>
+                    <dt className={styles.metadataLabel}>{label}</dt>
+                    <dd className={styles.metadataValue}>{value}</dd>
                   </div>
                 ))}
               </dl>
@@ -95,35 +90,29 @@ export default async function ProductPage({
           </div>
         </div>
 
-        <aside className="h-fit rounded border border-black/10 bg-white p-5 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-teal-800">
-            {brand}
-          </p>
+        <aside className={styles.purchasePanel}>
+          <p className={styles.brand}>{brand}</p>
           {series ? (
-            <p className="mt-2 text-sm font-medium text-neutral-700">
-              Series: {series}
-            </p>
+            <p className={styles.series}>Series: {series}</p>
           ) : null}
-          <p className="mt-4 text-2xl font-semibold text-neutral-950">
-            {fromPrice(product)}
-          </p>
+          <p className={styles.price}>{fromPrice(product)}</p>
 
           {graphics.length ? (
-            <p className="mt-4 text-sm leading-6 text-neutral-600">
-              <span className="font-medium text-neutral-900">
+            <p className={styles.optionSummary}>
+              <span className={styles.optionSummaryLabel}>
                 Graphics/Colors:
               </span>{" "}
               {graphics.join(", ")}
             </p>
           ) : null}
           {sizes.length ? (
-            <p className="mt-1 text-sm leading-6 text-neutral-600">
-              <span className="font-medium text-neutral-900">Sizes:</span>{" "}
+            <p className={styles.optionSummary}>
+              <span className={styles.optionSummaryLabel}>Sizes:</span>{" "}
               {sizes.join(", ")}
             </p>
           ) : null}
 
-          <div className="mt-6">
+          <div className={styles.selectorWrap}>
             <VariantSelector
               options={product.options || []}
               variants={product.variants || []}
@@ -132,23 +121,19 @@ export default async function ProductPage({
         </aside>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-neutral-950">
-          Available Variants
-        </h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <section className={styles.variantsSection}>
+        <h2 className={styles.variantsTitle}>Available Variants</h2>
+        <div className={styles.variantGrid}>
           {product.variants?.map((variant) => (
             <div
-              className="rounded border border-black/10 bg-white p-4"
+              className={styles.variantCard}
               key={variant.id || variant.sku || variant.title}
             >
-              <p className="font-medium text-neutral-950">{variant.title}</p>
+              <p className={styles.variantTitle}>{variant.title}</p>
               {variant.sku ? (
-                <p className="mt-1 text-xs uppercase tracking-[0.12em] text-neutral-500">
-                  {variant.sku}
-                </p>
+                <p className={styles.variantSku}>{variant.sku}</p>
               ) : null}
-              <p className="mt-3 text-sm font-semibold text-neutral-900">
+              <p className={styles.variantPrice}>
                 {variantPrice(variant) || "Price coming soon"}
               </p>
             </div>

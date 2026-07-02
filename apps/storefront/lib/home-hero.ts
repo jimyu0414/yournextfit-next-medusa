@@ -26,7 +26,7 @@ export const homeHeroSlides: HomeHeroSlide[] = [
     eyebrow: "Cloud Suntt",
     title: "Carving-focused boards for your next line",
     subtitle:
-      "Explore selected Cloud Suntt snowboard models built around edge hold, shape, and progression.",
+      "Explore selected Cloud Suntt snowboard all solid models built around edge hold, shape, and progression.",
     ctaText: "Shop Cloud Suntt",
   },
   {
@@ -40,7 +40,7 @@ export const homeHeroSlides: HomeHeroSlide[] = [
     eyebrow: "Maibk",
     title: "Soft-flex boards with playful style",
     subtitle:
-      "Discover Maibk Sugar boards for beginner-friendly park and all-mountain progression.",
+      "Discover Maibk Sugar boards for beginner and intermediate friendly carving, park and all-mountain progression.",
     ctaText: "Shop Maibk",
   },
   {
@@ -52,9 +52,9 @@ export const homeHeroSlides: HomeHeroSlide[] = [
     enabled: true,
     sortOrder: 30,
     eyebrow: "Cosone",
-    title: "Aggressive all-mountain performance",
+    title: "Find your next perfect snowboard without breaking the bank.",
     subtitle:
-      "Experience the power and precision of the Cosone Blaze snowboard in any condition.",
+      "Affordable value route with carving and progression-focused models. Cosone also has various graphics and sizes to suit your style and needs.",
     ctaText: "Shop Cosone",
   },
 ]

@@ -116,6 +116,10 @@ docker compose up -d
 docker compose down
 ```
 
+## Frontend Styling
+
+Future storefront styling should prefer SCSS Modules for component-specific styles. See [docs/frontend-style-guide.md](docs/frontend-style-guide.md).
+
 ## Troubleshooting
 
 ### Docker is not running

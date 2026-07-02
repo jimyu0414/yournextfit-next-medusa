@@ -1,0 +1,85 @@
+.selector {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.optionLabel {
+  margin-bottom: 0.5rem;
+  color: #171717;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.optionValues {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.optionButton {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+  background: var(--color-surface);
+  padding: 0.5rem 0.75rem;
+  color: #262626;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease;
+
+  &:hover {
+    border-color: #737373;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+}
+
+.optionButtonSelected {
+  border-color: #0a0a0a;
+  background: #0a0a0a;
+  color: #ffffff;
+}
+
+.optionButtonUnavailable {
+  opacity: 0.4;
+}
+
+.selectedPanel {
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  background: var(--color-surface);
+  padding: 1rem;
+}
+
+.selectedContent {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.selectedText {
+  color: #525252;
+  font-size: 0.875rem;
+}
+
+.selectedVariantTitle {
+  color: #0a0a0a;
+  font-weight: 500;
+}
+
+.selectedPrice {
+  color: #0a0a0a;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.unavailableMessage {
+  color: #78350f;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}

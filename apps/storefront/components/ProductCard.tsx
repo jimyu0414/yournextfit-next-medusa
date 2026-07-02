@@ -8,6 +8,7 @@ import {
   sizeValues,
   StoreProduct,
 } from "@/lib/catalog"
+import styles from "./ProductCard.module.scss"
 
 function DetailLine({ label, values }: { label: string; values: string[] }) {
   if (!values.length) {
@@ -15,8 +16,8 @@ function DetailLine({ label, values }: { label: string; values: string[] }) {
   }
 
   return (
-    <p className="text-sm leading-6 text-neutral-600">
-      <span className="font-medium text-neutral-800">{label}:</span>{" "}
+    <p className={styles.detailLine}>
+      <span className={styles.detailLabel}>{label}:</span>{" "}
       {values.join(", ")}
     </p>
   )
@@ -28,49 +29,41 @@ export function ProductCard({ product }: { product: StoreProduct }) {
   const sizes = sizeValues(product)
 
   return (
-    <article className="overflow-hidden rounded border border-black/10 bg-white shadow-sm">
-      <div className="relative aspect-[4/3] bg-neutral-200">
+    <article className={styles.card}>
+      <div className={styles.imageArea}>
         {product.thumbnail ? (
           <Image
             alt={product.title}
-            className="object-cover"
+            className={styles.image}
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 100vw"
             src={product.thumbnail}
           />
         ) : (
-          <div className="flex h-full items-center justify-center px-5 text-center text-sm font-medium text-neutral-500">
+          <div className={styles.imagePlaceholder}>
             Image coming soon
           </div>
         )}
       </div>
-      <div className="flex min-h-72 flex-col justify-between gap-5 p-5">
+      <div className={styles.body}>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-800">
-            {brandName(product)}
-          </p>
-          <h2 className="mt-2 text-lg font-semibold leading-snug text-neutral-950">
-            {product.title}
-          </h2>
+          <p className={styles.brand}>{brandName(product)}</p>
+          <h2 className={styles.title}>{product.title}</h2>
           {series ? (
-            <p className="mt-1 text-sm font-medium text-neutral-700">
-              Series: {series}
-            </p>
+            <p className={styles.series}>Series: {series}</p>
           ) : null}
-          <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
+          <p className={styles.description}>
             {product.description}
           </p>
-          <div className="mt-4 space-y-1">
+          <div className={styles.details}>
             <DetailLine label="Graphics/Colors" values={graphics} />
             <DetailLine label="Sizes" values={sizes} />
           </div>
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-base font-semibold text-neutral-900">
-            {fromPrice(product)}
-          </p>
+        <div className={styles.footer}>
+          <p className={styles.price}>{fromPrice(product)}</p>
           <Link
-            className="rounded border border-neutral-950 px-3 py-2 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-950 hover:text-white"
+            className={styles.detailsLink}
             href={`/products/${product.handle}`}
           >
             View Details

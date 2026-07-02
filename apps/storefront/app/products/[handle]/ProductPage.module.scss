@@ -1,0 +1,192 @@
+.layout {
+  display: grid;
+  gap: 2rem;
+}
+
+.mainColumn {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.imageArea {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  background: #e5e5e5;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.imagePlaceholder {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.25rem;
+  color: #737373;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.detailsPanel,
+.purchasePanel,
+.variantCard {
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  background: var(--color-surface);
+}
+
+.detailsPanel,
+.purchasePanel {
+  padding: 1.25rem;
+}
+
+.sectionTitle {
+  color: #0a0a0a;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.description {
+  margin-top: 0.75rem;
+  color: #404040;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.metadataGrid {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.metadataItem {
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  background: #fafafa;
+  padding: 0.75rem 1rem;
+}
+
+.metadataLabel {
+  color: #737373;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.metadataValue {
+  margin-top: 0.25rem;
+  color: #171717;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.purchasePanel {
+  height: fit-content;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.brand {
+  color: var(--color-brand);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.series {
+  margin-top: 0.5rem;
+  color: #404040;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.price {
+  margin-top: 1rem;
+  color: #0a0a0a;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.optionSummary {
+  margin-top: 1rem;
+  color: #525252;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+.optionSummary + .optionSummary {
+  margin-top: 0.25rem;
+}
+
+.optionSummaryLabel {
+  color: #171717;
+  font-weight: 500;
+}
+
+.selectorWrap {
+  margin-top: 1.5rem;
+}
+
+.variantsSection {
+  display: grid;
+  gap: 1rem;
+}
+
+.variantsTitle {
+  color: #0a0a0a;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.variantGrid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.variantCard {
+  padding: 1rem;
+}
+
+.variantTitle {
+  color: #0a0a0a;
+  font-weight: 500;
+}
+
+.variantSku {
+  margin-top: 0.25rem;
+  color: #737373;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.variantPrice {
+  margin-top: 0.75rem;
+  color: #171717;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+@media (min-width: 40rem) {
+  .metadataGrid,
+  .variantGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  }
+
+  .variantGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
