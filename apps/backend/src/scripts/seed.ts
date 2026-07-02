@@ -96,9 +96,9 @@ const snowboardCategory = "Snowboards"
 const catalogProducts: ProductSeedInput[] = [
   {
     title: "Cloud Suntt Regular Snowboard",
-    subtitle: "Regular series with three graphics.",
+    subtitle: "Regular series with two graphics.",
     description:
-      "Regular version with three board graphics/designs. Built for all-mountain carving progression with a balanced medium flex.",
+      "Regular version with two board graphics/designs. Built for all-mountain carving progression with a balanced medium-hard flex.",
     handle: "cloud-suntt-regular-snowboard",
     weight: 3000,
     categoryName: snowboardCategory,

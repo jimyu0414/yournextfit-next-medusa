@@ -4,6 +4,8 @@ import { useMemo, useState } from "react"
 import { StoreOption, StoreVariant, variantPrice } from "@/lib/catalog"
 import styles from "./VariantSelector.module.scss"
 
+export type VariantSelection = Record<string, string>
+
 function variantOptionMap(variant: StoreVariant) {
   const map = new Map<string, string>()
 
@@ -16,26 +18,55 @@ function variantOptionMap(variant: StoreVariant) {
   return map
 }
 
+export function getInitialVariantSelection(
+  options: StoreOption[],
+  variants: StoreVariant[]
+) {
+  const selection: VariantSelection = {}
+  const firstVariantOptions = variants[0] ? variantOptionMap(variants[0]) : null
+
+  options.forEach((option) => {
+    if (!option.title) {
+      return
+    }
+
+    const firstVariantValue = firstVariantOptions?.get(option.title)
+    const firstOptionValue = option.values?.find((value) => value.value)?.value
+    const initialValue = firstVariantValue || firstOptionValue
+
+    if (initialValue) {
+      selection[option.title] = initialValue
+    }
+  })
+
+  return selection
+}
+
 export function VariantSelector({
+  onSelectionChange,
   options,
+  selection: controlledSelection,
   variants,
 }: {
+  onSelectionChange?: (selection: VariantSelection) => void
   options: StoreOption[]
+  selection?: VariantSelection
   variants: StoreVariant[]
 }) {
-  const initialSelection = useMemo(() => {
-    const selection: Record<string, string> = {}
+  const initialSelection = useMemo(
+    () => getInitialVariantSelection(options, variants),
+    [options, variants]
+  )
+  const [internalSelection, setInternalSelection] = useState(initialSelection)
+  const selection = controlledSelection || internalSelection
 
-    options.forEach((option) => {
-      const firstValue = option.values?.find((value) => value.value)?.value
-      if (option.title && firstValue) {
-        selection[option.title] = firstValue
-      }
-    })
+  function updateSelection(nextSelection: VariantSelection) {
+    if (!controlledSelection) {
+      setInternalSelection(nextSelection)
+    }
 
-    return selection
-  }, [options])
-  const [selection, setSelection] = useState(initialSelection)
+    onSelectionChange?.(nextSelection)
+  }
 
   const selectedVariant = variants.find((variant) => {
     const optionMap = variantOptionMap(variant)
@@ -46,6 +77,10 @@ export function VariantSelector({
   })
 
   function isValueAvailable(title: string, value: string) {
+    if (!variants.length) {
+      return true
+    }
+
     return variants.some((variant) => {
       const optionMap = variantOptionMap(variant)
 
@@ -54,6 +89,16 @@ export function VariantSelector({
         return optionMap.get(selectedTitle) === expectedValue
       })
     })
+  }
+
+  if (!options.length) {
+    return (
+      <div className={styles.selectedPanel}>
+        <p className={styles.selectedText}>
+          No selectable options are configured for this product yet.
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -66,30 +111,39 @@ export function VariantSelector({
             .filter((value): value is string => Boolean(value)) || []
 
         return (
-          <div key={title}>
+          <div className={styles.optionGroup} key={title}>
             <p className={styles.optionLabel}>{title}</p>
             <div className={styles.optionValues}>
               {values.map((value) => {
                 const selected = selection[title] === value
                 const available = isValueAvailable(title, value)
+                const isGraphicOption = /graphic|color/i.test(title)
 
                 return (
                   <button
+                    aria-pressed={selected}
                     className={[
                       styles.optionButton,
+                      isGraphicOption ? styles.graphicOptionButton : "",
                       selected ? styles.optionButtonSelected : "",
                       available ? "" : styles.optionButtonUnavailable,
                     ].join(" ")}
+                    disabled={!available}
                     key={value}
                     onClick={() =>
-                      setSelection((current) => ({
-                        ...current,
+                      updateSelection({
+                        ...selection,
                         [title]: value,
-                      }))
+                      })
                     }
                     type="button"
                   >
                     {value}
+                    {!available ? (
+                      <span className={styles.unavailableLabel}>
+                        Unavailable
+                      </span>
+                    ) : null}
                   </button>
                 )
               })}
@@ -102,13 +156,16 @@ export function VariantSelector({
         {selectedVariant ? (
           <div className={styles.selectedContent}>
             <p className={styles.selectedText}>
-              Selected variant:{" "}
+              Selected variant{" "}
               <span className={styles.selectedVariantTitle}>
                 {selectedVariant.title}
               </span>
             </p>
             <p className={styles.selectedPrice}>
               {variantPrice(selectedVariant) || "Price coming soon"}
+            </p>
+            <p className={styles.availableMessage}>
+              Available for this configuration
             </p>
           </div>
         ) : (

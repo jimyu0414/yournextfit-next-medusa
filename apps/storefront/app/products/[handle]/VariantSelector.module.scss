@@ -3,8 +3,12 @@
   gap: 1.25rem;
 }
 
+.optionGroup {
+  display: grid;
+  gap: 0.5rem;
+}
+
 .optionLabel {
-  margin-bottom: 0.5rem;
   color: #171717;
   font-size: 0.875rem;
   font-weight: 700;
@@ -17,6 +21,7 @@
 }
 
 .optionButton {
+  min-height: 2.75rem;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 0.25rem;
   background: var(--color-surface);
@@ -38,6 +43,16 @@
     outline: 2px solid var(--color-brand);
     outline-offset: 2px;
   }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.graphicOptionButton {
+  min-width: 6rem;
+  justify-content: flex-start;
+  text-align: left;
 }
 
 .optionButtonSelected {
@@ -48,6 +63,16 @@
 
 .optionButtonUnavailable {
   opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.unavailableLabel {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
 .selectedPanel {
@@ -76,6 +101,12 @@
   color: #0a0a0a;
   font-size: 1.125rem;
   font-weight: 700;
+}
+
+.availableMessage {
+  color: var(--color-brand);
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .unavailableMessage {
